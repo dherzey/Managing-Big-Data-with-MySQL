@@ -80,15 +80,15 @@ SELECT
 	(SUM(sub.amt)/NumDays) AS Revenue
 FROM (
 	SELECT t.saledate,t.store,t.amt 
-    FROM trnsact t
-    WHERE 
-		t.sprice <> 0 AND t.stype='P'
-		AND NOT (EXTRACT(YEAR from t.saledate) = 2005
-		AND EXTRACT(MONTH from t.saledate) = 8)) AS sub		
+    	FROM trnsact t
+    	WHERE 
+	     	t.sprice <> 0 AND t.stype='P'
+	     	AND NOT (EXTRACT(YEAR from t.saledate) = 2005
+	     	AND EXTRACT(MONTH from t.saledate) = 8)) AS sub		
 GROUP BY 
-	EXTRACT(YEAR from sub.saledate) || 
-	EXTRACT(MONTH from sub.saledate),
-	sub.store
+     	EXTRACT(YEAR from sub.saledate) || 
+     	EXTRACT(MONTH from sub.saledate),
+     	sub.store
 HAVING COUNT(DISTINCT sub.saledate) >= 20
 ORDER BY Revenue DESC;
 
@@ -104,16 +104,16 @@ SELECT
 	msa.hs_ranking, 
 	SUM(sub.Revenue)/SUM(sub.NumDays) AS AvgDailyRev
 FROM (
-		SELECT 
-			store, COUNT(DISTINCT saledate) AS NumDays, 
-			SUM(amt) AS Revenue
-		FROM trnsact
-		WHERE 
-			sprice <> 0 AND stype='P' AND NOT
-			(EXTRACT(YEAR from t.saledate) = 2005
-			AND EXTRACT(MONTH from t.saledate) = 8)
-		GROUP BY store
-		HAVING NumDays >= 20 ) AS sub
+	SELECT 
+		store, COUNT(DISTINCT saledate) AS NumDays, 
+		SUM(amt) AS Revenue
+	FROM trnsact
+	WHERE 
+		sprice <> 0 AND stype='P' AND NOT
+		(EXTRACT(YEAR from t.saledate) = 2005
+		AND EXTRACT(MONTH from t.saledate) = 8)
+	GROUP BY store
+	HAVING NumDays >= 20 ) AS sub
 INNER JOIN (
 		SELECT store, CASE 
 			WHEN (msa_high >= 50 AND msa_high <= 60) 
@@ -140,16 +140,16 @@ SELECT sub.store, msa.msa_income AS MidIncome,
 	msa.hs_ranking AS HSRank,
 	SUM(sub.Revenue)/SUM(sub.NumDays) AS AvgDailyRev
 FROM (
-		SELECT 
-			store, COUNT(DISTINCT saledate) AS NumDays, 
-			SUM(amt) AS Revenue
-		FROM trnsact
-		WHERE 
-			sprice <> 0 AND stype='P' AND NOT
-			(EXTRACT(YEAR from t.saledate) = 2005
-			AND EXTRACT(MONTH from t.saledate) = 8)
-		GROUP BY store
-		HAVING NumDays >= 20 ) AS sub
+	SELECT 
+		store, COUNT(DISTINCT saledate) AS NumDays, 
+		SUM(amt) AS Revenue
+	FROM trnsact
+	WHERE 
+		sprice <> 0 AND stype='P' AND NOT
+		(EXTRACT(YEAR from t.saledate) = 2005
+		AND EXTRACT(MONTH from t.saledate) = 8)
+	GROUP BY store
+	HAVING NumDays >= 20 ) AS sub
 INNER JOIN (
 		SELECT store, msa_income, CASE 
 			WHEN (msa_high >= 50 AND msa_high <= 60) 
@@ -193,17 +193,17 @@ OUTPUT: Most of the sprice are way lower than the orgprice
 
 SELECT *
 FROM (
-		SELECT TOP 1
-			sku.sku, 
-			STDDEV_SAMP(t.sprice) AS PriceSTD, 
-			COUNT(t.saledate) AS NumTrnsact
-		FROM trnsact t 
-			INNER JOIN skuinfo sku ON t.sku = sku.sku
-		WHERE t.stype='P'
-		GROUP BY sku.sku, sku.brand
-		HAVING NumTrnsact > 100
-		ORDER BY PriceSTD DESC) AS T
-	INNER JOIN trnsact ON T.sku = trnsact.sku;
+	SELECT TOP 1
+		sku.sku, 
+		STDDEV_SAMP(t.sprice) AS PriceSTD, 
+		COUNT(t.saledate) AS NumTrnsact
+	FROM trnsact t 
+		INNER JOIN skuinfo sku ON t.sku = sku.sku
+	WHERE t.stype='P'
+	GROUP BY sku.sku, sku.brand
+	HAVING NumTrnsact > 100
+	ORDER BY PriceSTD DESC) AS T
+INNER JOIN trnsact ON T.sku = trnsact.sku;
 
 	
 /*----------------------Exercise 9-------------------------
@@ -238,31 +238,31 @@ SELECT TOP 1 T2.dept, T2.store, T2.city, T2.state,
 		SUM(T2.DecSales/T2.DecDays) AS AvgDecSales,
 		((AvgDecSales-AvgNovSales)/AvgNovSales)*100 AS PercentInc
 FROM (	SELECT
-			T.dept, T.store, T.city, T.state, 
-			SUM(CASE WHEN T.MonthDate = 11 
-				THEN T.amount END) AS NovSales,
-			SUM(CASE WHEN T.MonthDate = 12 
-				THEN T.amount END) AS DecSales,
-			COUNT(DISTINCT CASE WHEN T.MonthDate = 11 
-				THEN T.saledate END) AS NovDays,
-			COUNT(DISTINCT CASE WHEN T.MonthDate = 12 
-				THEN T.saledate END) AS DecDays		
-		FROM ( 	SELECT 
-					str.state, str.city, str.store, dep.dept, 
-					SUM(trn.amt) AS amount, trn.saledate,
-					EXTRACT(MONTH from trn.saledate) AS MonthDate,
-					EXTRACT(YEAR from trn.saledate) AS YearDate
-				FROM trnsact trn 
-					INNER JOIN skuinfo sku ON trn.sku = sku.sku
-					INNER JOIN strinfo str ON trn.store = str.store
-					INNER JOIN deptinfo dep ON sku.dept = dep.dept
-				WHERE 
-					EXTRACT(MONTH from trn.saledate) IN (11,12)
-					AND trn.stype='P' AND trn.sprice <> 0 
-				GROUP BY str.state, str.city, str.store, dep.dept, 
-						trn.saledate, MonthDate, YearDate) AS T		
-		GROUP BY T.dept, T.store, T.city, T.state 
-		HAVING NovDays >= 20 AND DecDays >= 20 ) AS T2
+		T.dept, T.store, T.city, T.state, 
+		SUM(CASE WHEN T.MonthDate = 11 
+			THEN T.amount END) AS NovSales,
+		SUM(CASE WHEN T.MonthDate = 12 
+			THEN T.amount END) AS DecSales,
+		COUNT(DISTINCT CASE WHEN T.MonthDate = 11 
+			THEN T.saledate END) AS NovDays,
+		COUNT(DISTINCT CASE WHEN T.MonthDate = 12 
+			THEN T.saledate END) AS DecDays		
+	FROM ( 	SELECT 
+			str.state, str.city, str.store, dep.dept, 
+			SUM(trn.amt) AS amount, trn.saledate,
+			EXTRACT(MONTH from trn.saledate) AS MonthDate,
+			EXTRACT(YEAR from trn.saledate) AS YearDate
+		FROM trnsact trn 
+			INNER JOIN skuinfo sku ON trn.sku = sku.sku
+			INNER JOIN strinfo str ON trn.store = str.store
+			INNER JOIN deptinfo dep ON sku.dept = dep.dept
+		WHERE 
+			EXTRACT(MONTH from trn.saledate) IN (11,12)
+			AND trn.stype='P' AND trn.sprice <> 0 
+		GROUP BY str.state, str.city, str.store, dep.dept, 
+				trn.saledate, MonthDate, YearDate) AS T		
+	GROUP BY T.dept, T.store, T.city, T.state 
+	HAVING NovDays >= 20 AND DecDays >= 20 ) AS T2
 GROUP BY T2.dept, T2.store, T2.city, T2.state
 ORDER BY PercentInc DESC;
 
@@ -287,20 +287,20 @@ FROM (	SELECT T.store, T.city, T.state,
 			THEN T.saledate END) AS SepDays
 		
 		FROM ( 	SELECT 
-					str.store, str.city, str.state,
-					SUM(trn.amt) AS amount, trn.saledate,
-					EXTRACT(MONTH from trn.saledate) AS MonthDate,
-					EXTRACT(YEAR from trn.saledate) AS YearDate
-				FROM trnsact trn 				
-					INNER JOIN strinfo str ON trn.store = str.store
-				WHERE trn.stype='P' AND trn.sprice <> 0 
-					  AND EXTRACT(MONTH from trn.saledate) IN (8,9)
-					  AND NOT (EXTRACT(YEAR from trn.saledate = 2005
-					  AND EXTRACT(MONTH from trn.saledate) = 8)
-				GROUP BY str.store, str.city, str.state, 
-						 trn.saledate, MonthDate, YearDate) AS T
-		GROUP BY T.store, T.city, T.state 
-		HAVING AugDays >= 20 AND SepDays >= 20 ) AS T2
+				str.store, str.city, str.state,
+				SUM(trn.amt) AS amount, trn.saledate,
+				EXTRACT(MONTH from trn.saledate) AS MonthDate,
+				EXTRACT(YEAR from trn.saledate) AS YearDate
+			FROM trnsact trn 				
+				INNER JOIN strinfo str ON trn.store = str.store
+			WHERE trn.stype='P' AND trn.sprice <> 0 
+				  AND EXTRACT(MONTH from trn.saledate) IN (8,9)
+				  AND NOT (EXTRACT(YEAR from trn.saledate = 2005
+				  AND EXTRACT(MONTH from trn.saledate) = 8)
+			GROUP BY str.store, str.city, str.state, 
+					 trn.saledate, MonthDate, YearDate) AS T
+	GROUP BY T.store, T.city, T.state 
+	HAVING AugDays >= 20 AND SepDays >= 20 ) AS T2
 GROUP BY T2.store, T2.city, T2.state
 ORDER BY AvgDifference ASC;
 
@@ -311,33 +311,33 @@ maximum average daily revenue? How do they compare?
 ----------------------------------------------------------*/
 
 SELECT CASE
-		WHEN T.MonthDate = 1 THEN 'Jan'
-		WHEN T.MonthDate = 2 THEN 'Feb'
-		WHEN T.MonthDate = 3 THEN 'Mar'
-		WHEN T.MonthDate = 4 THEN 'Apr'
-		WHEN T.MonthDate = 5 THEN 'May'
-		WHEN T.MonthDate = 6 THEN 'Jun'
-		WHEN T.MonthDate = 7 THEN 'Jul'
-		WHEN T.MonthDate = 8 THEN 'Aug'
-		WHEN T.MonthDate = 9 THEN 'Sep'
-		WHEN T.MonthDate = 10 THEN 'Oct'
-		WHEN T.MonthDate = 11 THEN 'Nov'
-		WHEN T.MonthDate = 12 THEN 'Dec'
-		END AS BestMonth,
+	WHEN T.MonthDate = 1 THEN 'Jan'
+	WHEN T.MonthDate = 2 THEN 'Feb'
+	WHEN T.MonthDate = 3 THEN 'Mar'
+	WHEN T.MonthDate = 4 THEN 'Apr'
+	WHEN T.MonthDate = 5 THEN 'May'
+	WHEN T.MonthDate = 6 THEN 'Jun'
+	WHEN T.MonthDate = 7 THEN 'Jul'
+	WHEN T.MonthDate = 8 THEN 'Aug'
+	WHEN T.MonthDate = 9 THEN 'Sep'
+	WHEN T.MonthDate = 10 THEN 'Oct'
+	WHEN T.MonthDate = 11 THEN 'Nov'
+	WHEN T.MonthDate = 12 THEN 'Dec'
+	END AS BestMonth,
 COUNT(T.store) AS NumOfStores
 FROM (
-		SELECT
-			trn.store, COUNT(DISTINCT trn.saledate) AS NumDays,
-			EXTRACT(MONTH from trn.saledate) AS MonthDate, 
-			SUM(trn.amt)/NumDays AS Revenue,
-			RANK() OVER (PARTITION BY trn.store 
-				ORDER BY Revenue DESC) AS AmountRank
-		FROM trnsact trn
-		QUALIFY AmountRank = 1
-		WHERE trn.stype='P' AND NOT
-			  (EXTRACT(MONTH from trn.saledate) = 8 
-			  AND EXTRACT(YEAR from trn.saledate) = 2005)
-		GROUP BY trn.store, MonthDate
-		HAVING NumDays >= 20 ) AS T
+	SELECT
+		trn.store, COUNT(DISTINCT trn.saledate) AS NumDays,
+		EXTRACT(MONTH from trn.saledate) AS MonthDate, 
+		SUM(trn.amt)/NumDays AS Revenue,
+		RANK() OVER (PARTITION BY trn.store 
+			ORDER BY Revenue DESC) AS AmountRank
+	FROM trnsact trn
+	QUALIFY AmountRank = 1
+	WHERE trn.stype='P' AND NOT
+		  (EXTRACT(MONTH from trn.saledate) = 8 
+		  AND EXTRACT(YEAR from trn.saledate) = 2005)
+	GROUP BY trn.store, MonthDate
+	HAVING NumDays >= 20 ) AS T
 GROUP BY BestMonth
 ORDER BY NumOfStores DESC;
