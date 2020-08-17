@@ -266,6 +266,7 @@ FROM (	SELECT
 GROUP BY T2.dept, T2.store, T2.city, T2.state
 ORDER BY PercentInc DESC;
 
+
 /*---------------------Exercise 11-------------------------
 Which city and state of what store had the greatest decrease 
 in average daily sales revenue from August to September?
@@ -302,6 +303,7 @@ FROM (	SELECT T.store, T.city, T.state,
 		HAVING AugDays >= 20 AND SepDays >= 20 ) AS T2
 GROUP BY T2.store, T2.city, T2.state
 ORDER BY AvgDifference ASC;
+
 
 /*---------------------Exercise 12-------------------------
 For each month, determine how many stores have their
